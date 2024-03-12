@@ -75,16 +75,12 @@ app.post("/upload", upload.single("file"), async (req, res) => {
 
 app.get("/download", (req, res) => {
   const filePath = req.query.filePath;
-  console.log("Download");
 
-  // Check if filePath is provided
   if (!filePath) {
     return res.status(400).send("File path is missing");
   }
 
-  // Check if the file exists
   if (fs.existsSync(filePath)) {
-    // Set the appropriate headers for file download
     res.setHeader(
       "Content-Disposition",
       `attachment; filename=${path.basename(filePath)}`
