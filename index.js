@@ -56,20 +56,23 @@ app.get("/", (req, res) => {
   res.status(200).send("Server is running on port 3030");
 });
 
-app.post("/upload", upload.single("file"), async (req, res) => {
+app.post("/upload/:visitorId", upload.single("file"), async (req, res) => {
   if (!req.file) {
     return res.status(400).send("No files were uploaded.");
   }
 
+  const visitorId = req.params.visitorId;
+
   const filePath = req.file.path;
-  const filename = req.file.originalname;
+  const fileName = req.file.originalname;
   const systemPath = process.cwd();
   const fullPath = path.join(systemPath, filePath);
 
   res.status(200).json({
     message: "File uploaded successfully.",
-    filename: filename,
-    fullPath: fullPath,
+    fileName,
+    fullPath,
+    visitorId
   });
 });
 
@@ -86,6 +89,28 @@ app.get("/download", (req, res) => {
       `attachment; filename=${path.basename(filePath)}`
     );
     res.sendFile(filePath);
+  } else {
+    res.status(404).send("File not found");
+  }
+});
+
+app.delete("/delete", (req, res) => {
+  const filePath = req.query.filePath;
+
+  if (!filePath) {
+    return res.status(400).send("File path is missing");
+  }
+
+  
+
+  if (fs.existsSync(filePath)) {
+    fs.unlink(filePath, (err) => {
+      if (err) {
+        res.status(500).send("Error deleting the file");
+      } else {
+        res.status(200).send("File deleted successfully");
+      }
+    });
   } else {
     res.status(404).send("File not found");
   }
