@@ -53,12 +53,12 @@ const upload = multer({
 });
 
 app.get("/", (req, res) => {
-  res.status(200).send("Server is running on port 3030");
+  res.status(200).json("Server is running on port 3030");
 });
 
 app.post("/upload/:visitorId", upload.single("file"), async (req, res) => {
   if (!req.file) {
-    return res.status(400).send("No files were uploaded.");
+    return res.status(400).json("No files were uploaded.");
   }
 
   const visitorId = req.params.visitorId;
@@ -72,7 +72,7 @@ app.post("/upload/:visitorId", upload.single("file"), async (req, res) => {
     message: "File uploaded successfully.",
     fileName,
     fullPath,
-    visitorId
+    visitorId,
   });
 });
 
@@ -80,7 +80,7 @@ app.get("/download", (req, res) => {
   const filePath = req.query.filePath;
 
   if (!filePath) {
-    return res.status(400).send("File path is missing");
+    return res.status(400).json("File path is missing");
   }
 
   if (fs.existsSync(filePath)) {
@@ -90,7 +90,7 @@ app.get("/download", (req, res) => {
     );
     res.sendFile(filePath);
   } else {
-    res.status(404).send("File not found");
+    res.status(404).json("File not found");
   }
 });
 
@@ -98,29 +98,28 @@ app.delete("/delete", (req, res) => {
   const filePath = req.query.filePath;
 
   if (!filePath) {
-    return res.status(400).send("File path is missing");
+    return res.status(400).json("File path is missing");
   }
-
-  
 
   if (fs.existsSync(filePath)) {
     fs.unlink(filePath, (err) => {
       if (err) {
-        res.status(500).send("Error deleting the file");
+        res.status(500).json("Error deleting the file");
       } else {
-        res.status(200).send("File deleted successfully");
+        console.log("File deleted successfully");
+        res.status(200).json("File deleted successfully");
       }
     });
   } else {
-    res.status(404).send("File not found");
+    res.status(404).json("File not found");
   }
 });
 
 app.use((err, req, res, next) => {
   if (err instanceof multer.MulterError) {
-    res.status(400).send("File upload error: " + err.message);
+    res.status(400).json({ message: "File upload error: " + err.message });
   } else {
-    res.status(500).send("Internal server error: " + err.message);
+    res.status(500).json({ message: "Internal server error: " + err.message });
   }
 });
 
