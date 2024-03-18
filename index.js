@@ -117,9 +117,9 @@ app.delete("/delete", (req, res) => {
 
 app.use((err, req, res, next) => {
   if (err instanceof multer.MulterError) {
-    res.status(400).json({ message: "File upload error: " + err.message });
+    res.status(400).json("File upload error: " + err.message);
   } else {
-    res.status(500).json({ message: "Internal server error: " + err.message });
+    res.status(500).json("Internal server error: " + err.message);
   }
 });
 
